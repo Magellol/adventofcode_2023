@@ -75,14 +75,28 @@ fn day1(input: Vec<String>) -> i32 {
 
 #[test]
 fn day1_test() {
-    let input = vec![
+    let input1 = vec![
         "1abc2".to_string(),
         "pqr3stu8vwx".to_string(),
         "a1b2c3d4e5f".to_string(),
         "treb7uchet".to_string(),
     ];
 
-    assert_eq!(day1(input), 142);
+    let input2 = vec![
+        "two1nine".to_string(),
+        "eightwothree".to_string(),
+        "abcone2threexyz".to_string(),
+        "xtwone3four".to_string(),
+        "4nineeightseven2".to_string(),
+        "zoneight234".to_string(),
+        "7pqrstsixteen".to_string(),
+    ];
+
+    let input3 = vec!["2rzvpfpgzxk3863eightoneighttbb".to_string()];
+
+    assert_eq!(day1(input1), 142);
+    assert_eq!(day1(input2), 281);
+    assert_eq!(day1(input3), 28);
 }
 
 fn main() {
