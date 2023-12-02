@@ -45,10 +45,12 @@ fn day1(input: Vec<String>) -> i32 {
     input.iter().fold(0, |acc, s| {
         let mut start = 0;
         let mut result = vec![];
-        while let Some(m) = re.captures_from_pos(s, start).unwrap() {
-            let x = m.get(1).unwrap();
-            result.push(&s[x.start()..x.end()]);
-            start = m.get(0).unwrap().start() + 1;
+        while let Some(_match) = re.captures_from_pos(s, start).unwrap() {
+            let inner = _match.get(1).unwrap();
+            result.push(&s[inner.start()..inner.end()]);
+
+            // Manually iterating to find overlapping matches.
+            start = _match.get(0).unwrap().start() + 1;
         }
 
         let matches: Vec<i32> = result
