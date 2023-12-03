@@ -25,39 +25,37 @@ impl FromStr for Color {
 
 type Turn = HashMap<Color, i32>;
 
-// only 12 red cubes, 13 green cubes, and 14 blue cubes
-fn day2(input: Vec<String>, max: Turn) -> i32 {
+fn day2(input: Vec<String>) -> i32 {
     let turn_re = Regex::new(r"(\d+) (\w+)").unwrap();
 
     input
         .into_iter()
-        .filter_map(|s| {
-            let (id, turn_str) = sscanf::sscanf!(s, "Game {i32}:{str}").unwrap();
+        .map(|game_str| {
+            let mut turn: Turn = HashMap::from([(Color::R, 0), (Color::G, 0), (Color::B, 0)]);
 
-            // Turn: 8 green, 6 blue, 20 red
-            let impossible_turns: Vec<(i32, Color)> = turn_re
-                .find_iter(turn_str)
-                .filter_map(|m| {
-                    let match_ = turn_re.captures(m.as_str()).unwrap();
-                    let n = match_.get(1).and_then(|x| x.as_str().parse::<i32>().ok());
-                    let color = match_.get(2).and_then(|x| Color::from_str(x.as_str()).ok());
+            for m in turn_re.find_iter(&game_str) {
+                let match_ = turn_re.captures(m.as_str()).unwrap();
+                let n = match_
+                    .get(1)
+                    .and_then(|x| x.as_str().parse::<i32>().ok())
+                    .unwrap();
+                let color = match_
+                    .get(2)
+                    .and_then(|x| Color::from_str(x.as_str()).ok())
+                    .unwrap();
 
-                    n.zip(color).filter(|(n, color)| n > &max[color])
-                })
-                .collect();
-
-            if impossible_turns.len() > 0 {
-                None
-            } else {
-                Some(id)
+                if n > turn[&color] {
+                    turn.insert(color, n);
+                }
             }
+
+            turn[&Color::R] * turn[&Color::G] * turn[&Color::B]
         })
         .sum()
 }
 
 #[test]
 fn day2_test() {
-    let max: Turn = HashMap::from([(Color::R, 12), (Color::G, 13), (Color::B, 14)]);
     let input = vec![
         "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green".to_string(),
         "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue".to_string(),
@@ -66,12 +64,11 @@ fn day2_test() {
         "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green".to_string(),
     ];
 
-    assert_eq!(day2(input, max), 8);
+    assert_eq!(day2(input), 2286);
 }
 
 fn main() {
-    let max: Turn = HashMap::from([(Color::R, 12), (Color::G, 13), (Color::B, 14)]);
     let contents = lines_from_file("./day2/input.txt");
 
-    println!("{}", day2(contents, max))
+    println!("{}", day2(contents))
 }
