@@ -1,20 +1,8 @@
 // https://adventofcode.com/2023/day/1
 
 use fancy_regex::Regex;
-use std::{
-    collections::HashMap,
-    fs::File,
-    io::{prelude::*, BufReader},
-    path::Path,
-};
-
-fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
-    let file = File::open(filename).expect("no such file");
-    let buf = BufReader::new(file);
-    buf.lines()
-        .map(|l| l.expect("Could not parse line"))
-        .collect()
-}
+use std::collections::HashMap;
+use lib::lines_from_file;
 
 fn day1(input: Vec<String>) -> i32 {
     let entries = HashMap::from([

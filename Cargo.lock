@@ -31,6 +31,7 @@ name = "day1"
 version = "0.1.0"
 dependencies = [
  "fancy-regex",
+ "lib",
 ]
 
 [[package]]
@@ -42,6 +43,10 @@ dependencies = [
  "bit-set",
  "regex",
 ]
+
+[[package]]
+name = "lib"
+version = "0.1.0"
 
 [[package]]
 name = "memchr"
