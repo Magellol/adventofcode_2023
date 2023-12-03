@@ -13,11 +13,11 @@ $ rustup toolchain install stable-aarch64-apple-darwin
 Run the following where `{day}` is `day1`, `day2`, ...
 
 ```console
-$ cargo run {day}
+$ cargo run --bin {day}
 ```
 
 Tests are also available as I've used them to build each of the solutions
 
 ```console
-$ cargo test {day}
+$ cargo test --package {day}
 ```
