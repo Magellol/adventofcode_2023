@@ -77,6 +77,7 @@ name = "day3"
 version = "0.1.0"
 dependencies = [
  "lib",
+ "regex",
 ]
 
 [[package]]
