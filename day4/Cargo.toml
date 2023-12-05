@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 lib = { path = "../lib" }
+num-traits = "0.2.17"
