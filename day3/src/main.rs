@@ -1,15 +1,8 @@
-use std::cmp;
-
 use regex::Regex;
-
-fn has_symbol(s: &str) -> bool {
-    let re = Regex::new(r"([^\d+.]|\+)+").unwrap();
-
-    re.is_match(s)
-}
 
 fn day3(input: Vec<String>) -> i32 {
     let n_re = Regex::new(r"\d+").unwrap();
+    let symbol_re = Regex::new(r"\*+").unwrap();
 
     input
         .iter()
@@ -22,25 +15,57 @@ fn day3(input: Vec<String>) -> i32 {
                 None
             };
 
-            let prev_line = previous_index.and_then(|i| input.get(i));
-            let next_line = next_index.and_then(|i| input.get(i));
+            let default_value = String::new();
 
-            n_re.find_iter(line)
-                .filter_map(|m| {
-                    let _str = m.as_str();
-                    let start = m.start().saturating_sub(1);
-                    let end = cmp::min(line.len() - 1, m.end() + 1);
+            let prev_line = previous_index
+                .and_then(|i| input.get(i))
+                .unwrap_or(&default_value);
+            let next_line = next_index
+                .and_then(|i| input.get(i))
+                .unwrap_or(&default_value);
 
-                    if has_symbol(&line[start..end]) {
-                        Some(_str)
+            symbol_re
+                .find_iter(line)
+                .map(|symbol_m| {
+                    let current_iter = n_re
+                        .find_iter(line)
+                        .chain(n_re.find_iter(prev_line))
+                        .chain(n_re.find_iter(next_line));
+
+                    let result = current_iter
+                        .filter_map(|n_match| {
+                            // * Apologies for the following code. I'm 100% certain there is a cleaner way but also I'm 100% tired.
+                            // ...123
+                            // ..*..
+                            if (n_match.start() == symbol_m.end())
+                            // 123.
+                            // ...*..
+                                || (n_match.end() == symbol_m.start())
+                            // 123
+                            // *..
+                                || (n_match.start() == symbol_m.start())
+                            
+                            // 123.
+                            //   *.
+                                || (n_match.end() == symbol_m.end())
+
+                            // 123.
+                            // .*..
+                                || (n_match.start() == symbol_m.start().saturating_sub(1))
+                            {
+                                n_match.as_str().parse::<i32>().ok()
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<i32>>();
+
+                    if result.len() == 2 {
+                        result.iter().fold(1, |acc, n| acc * n)
                     } else {
-                        prev_line
-                            .filter(|x| has_symbol(&x[start..end]))
-                            .or_else(|| next_line.filter(|x| has_symbol(&x[start..end])))
-                            .map(|_| _str)
+                        0
                     }
                 })
-                .map(|x| x.parse::<i32>().unwrap())
                 .sum::<i32>()
         })
         .sum::<i32>()
@@ -61,7 +86,7 @@ fn day3_test() {
         ".664.598..".to_string(),
     ];
 
-    assert_eq!(day3(input), 4361);
+    assert_eq!(day3(input), 467835);
 }
 
 fn main() {
