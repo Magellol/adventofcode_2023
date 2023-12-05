@@ -1,6 +1,34 @@
 use lib::lines_from_file;
+use num_traits::pow;
 
-fn day4(input: Vec<String>) -> i32 {}
+fn day4(input: Vec<String>) -> i32 {
+    input.iter().fold(0, |acc, line| {
+        let result = line.find(":").map(|i| {
+            let split = &line[(i + 1)..];
+            split
+                .trim()
+                .splitn(2, "|")
+                .map(|x| x.split_whitespace().map(|x| x.parse().unwrap()).collect())
+                .collect::<Vec<Vec<i32>>>()
+        });
+
+        let result = if let Some([left, right]) = result.map(|x| x.as_slice().to_owned()).as_deref()
+        {
+            let matches = right.iter().filter(|x| left.contains(x)).count();
+
+            if matches > 0 {
+                // e.g 1 * 2^3
+                1 * pow(2, matches - 1)
+            } else {
+                0
+            }
+        } else {
+            0
+        };
+
+        acc + result
+    })
+}
 
 #[test]
 fn day4_test() {
