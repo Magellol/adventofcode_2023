@@ -1,33 +1,58 @@
+use regex::Regex;
+use std::collections::HashMap;
+
 use lib::lines_from_file;
-use num_traits::pow;
 
-fn day4(input: Vec<String>) -> i32 {
-    input.iter().fold(0, |acc, line| {
-        let result = line.find(":").map(|i| {
-            let split = &line[(i + 1)..];
-            split
-                .trim()
-                .splitn(2, "|")
-                .map(|x| x.split_whitespace().map(|x| x.parse().unwrap()).collect())
-                .collect::<Vec<Vec<i32>>>()
-        });
+fn get_card_id(line: &str) -> i32 {
+    let re = Regex::new(r"Card\s+(\d+):").unwrap();
 
-        let result = if let Some([left, right]) = result.map(|x| x.as_slice().to_owned()).as_deref()
-        {
-            let matches = right.iter().filter(|x| left.contains(x)).count();
+    re.captures(line)
+        .and_then(|m| m.get(1))
+        .and_then(|x| x.as_str().parse::<i32>().ok())
+        .unwrap()
+}
 
-            if matches > 0 {
-                // e.g 1 * 2^3
-                1 * pow(2, matches - 1)
+fn process(x: &Vec<String>, map: &HashMap<i32, String>) -> i32 {
+    x.iter().fold(0, |acc, line| {
+        // A bit of duplication here...
+        let id = get_card_id(line);
+        let ns = line.split(":").nth(1).unwrap();
+
+        let split = ns
+            .split("|")
+            .map(|x| x.split_whitespace().map(|x| x.parse().unwrap()).collect())
+            .collect::<Vec<Vec<i32>>>();
+
+        if let [left, right] = split.as_slice() {
+            let matches: Vec<String> = right
+                .iter()
+                .filter(|x| left.contains(x))
+                .enumerate()
+                .filter_map(|(i, _x)| {
+                    let index = id + i as i32 + 1;
+                    map.get(&index).map(|x| x.to_owned())
+                })
+                .collect();
+
+            if matches.len() == 0 {
+                acc
             } else {
-                0
+                1 + acc + process(&matches, map)
             }
         } else {
-            0
-        };
-
-        acc + result
+            acc
+        }
     })
+}
+
+fn day4(input: Vec<String>) -> i32 {
+    let mut dict: HashMap<i32, String> = HashMap::new();
+
+    for line in input.iter() {
+        dict.insert(get_card_id(line), line.to_owned());
+    }
+
+    process(&input, &dict)
 }
 
 #[test]
@@ -41,7 +66,7 @@ fn day4_test() {
         "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11".to_string(),
     ];
 
-    assert_eq!(day4(input), 13);
+    assert_eq!(day4(input), 30);
 }
 
 fn main() {
