@@ -1,7 +1,8 @@
 use lib::lines_from_file;
 
-fn day6(input: Vec<String>) -> i32 {
-    let races = [(60, 601), (80, 1163), (86, 1559), (76, 1300)];
+// TODO I still need to handle parsing
+fn day6(input: Vec<String>) -> i64 {
+    let races: [(i64, i64); 1] = [(60808676, 601116315591300)];
 
     races.iter().fold(1, |acc, (time, distance)| {
         let range = 0..*time + 1;
